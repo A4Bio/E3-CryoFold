@@ -27,7 +27,11 @@ def load_model(model_path: str, device: str) -> CryoFold:
         norm="instance", decoder_dim=128
     ).to(device)
     checkpoint = torch.load(model_path, map_location=device, weights_only=True)
-    cryofold.load_state_dict(checkpoint)
+    try:
+        cryofold.load_state_dict(checkpoint)
+    except:
+        checkpoint = {k.replace('_forward_module.',''):v for k,v in checkpoint.items()}
+        cryofold.load_state_dict(checkpoint)
     return cryofold
 
 
