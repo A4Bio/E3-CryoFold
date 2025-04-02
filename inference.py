@@ -30,7 +30,7 @@ def load_model(model_path: str, device: str) -> CryoFold:
     try:
         cryofold.load_state_dict(checkpoint)
     except:
-        checkpoint = {k.replace('_forward_module.model.',''):v for k,v in checkpoint.items()}
+        checkpoint = {k.replace('_forward_module.model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
         cryofold.load_state_dict(checkpoint)
     return cryofold
 
