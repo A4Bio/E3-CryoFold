@@ -125,7 +125,7 @@ class Protein:
         return protein
 
     @classmethod
-    def from_XCS(cls, X: torch.Tensor, C: torch.Tensor, S: torch.Tensor) -> Protein:
+    def from_XCS(cls, X: torch.Tensor, C: torch.Tensor, S: torch.Tensor, alphabet=None) -> Protein:
         """
         Create a Protein object from XCS representations.
 
@@ -142,7 +142,7 @@ class Protein:
             Protein: Initialized Protein object from the given XCS representation.
         """
         protein = super(Protein, cls).__new__(cls)
-        protein.sys = System.from_XCS(X, C, S)
+        protein.sys = System.from_XCS(X, C, S, alternate_alphabet=alphabet)
         protein.device = X.device
         return protein
 
