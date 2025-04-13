@@ -3,13 +3,13 @@ import argparse
 import torch
 from src.chroma.data import Protein
 from model import CryoFold
-from utils import align, get_data, get_coord_from_pdb
+from utils import align, get_data, get_coord_from_pdb, alphabet
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="CryoFold: density map to protein structure")
-    parser.add_argument('--density_map_path', type=str, help='Path to the input data directory')
-    parser.add_argument('--pdb_path', type=str, default=None, help='Path to the ground truth PDB file')
+    parser.add_argument('--density_map_path', type=str, default='examples/density_map', help='Path to the input data directory')
+    parser.add_argument('--pdb_path', type=str, default='examples/5uz7.pdb', help='Path to the ground truth PDB file')
     parser.add_argument('--model_path', type=str, default='pretrained_model/checkpoint.pt', 
                         help='Path to the pretrained model checkpoint')
     parser.add_argument('--output_dir', type=str, default='results', 
@@ -60,8 +60,7 @@ def save_protein(preds: torch.Tensor, seqs: torch.Tensor, chain_encodings: torch
     output_path = os.path.join(output_dir, output_name + '.pdb')
 
     # Process sequence values to ensure they fall within a valid range
-    seqs[seqs > 19] = 0
-    protein = Protein.from_XCS(preds.unsqueeze(0), chain_encodings.unsqueeze(0), seqs.unsqueeze(0))
+    protein = Protein.from_XCS(preds.unsqueeze(0), chain_encodings.unsqueeze(0), seqs.unsqueeze(0), alphabet=alphabet)
     protein.to_PDB(output_path)
     print(f"Protein structure saved to {output_path}")
 
