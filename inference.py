@@ -28,9 +28,10 @@ def load_model(model_path: str, device: str) -> CryoFold:
     ).to(device)
     checkpoint = torch.load(model_path, map_location=device, weights_only=True)
     try:
+        checkpoint = {k.replace('model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
         cryofold.load_state_dict(checkpoint)
     except:
-        checkpoint = {k.replace('model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
+        checkpoint = {k.replace('_forward_module.model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
         cryofold.load_state_dict(checkpoint)
     return cryofold
 
