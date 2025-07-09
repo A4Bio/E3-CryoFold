@@ -1,4 +1,4 @@
-## Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues. Apologize for the delay and the inconvenience of our code.
+### Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues. Apologize for the delay and the inconvenience of our code.
 
 # E3-CryoFold: One-shot Prediction For Cryo-EM Structure Determination
 
