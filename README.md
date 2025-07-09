@@ -1,3 +1,5 @@
+## Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues. Apologize for the delay and the inconvenience of our code.
+
 # E3-CryoFold: One-shot Prediction For Cryo-EM Structure Determination
 
 E3-CryoFold is a deep learning framework for automating the determination of three-dimensional atomic structures from high-resolution cryo-electron microscopy (Cryo-EM) density maps. It addresses the limitations of existing AI-based methods by providing an end-to-end solution that integrates training and inference into a single streamlined pipeline. E3-CryoFold combines 3D and sequence Transformers for feature extraction and employs an equivariant graph neural network to build accurate atomic structures from density maps.
