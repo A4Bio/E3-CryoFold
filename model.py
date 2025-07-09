@@ -62,11 +62,19 @@ class CryoFold(nn.Module):
         _, length = seq.shape
 
         transformer_input = self.embed(x)
-        seq = self.esm(seq, repr_layers=[12])['representations'][12] 
-        seq = seq + self.chain_embed(chain_encoding) + self.position_emb(seq_pos)
-        protein, seq = self.transformer(transformer_input, seq, mask.float())
-        y = self.cross_attn(seq, protein, protein)
-        h_V = self.to_hV(y)
+
+        ys = []
+        h_Vs = []
+        for i in range(0, length, 1000):
+            seq_feat = self.esm(seq[:, i: i+1000], repr_layers=[12])['representations'][12] 
+            seq_feat = seq_feat + self.chain_embed(chain_encoding[:, i: i+1000]) + self.position_emb(seq_pos[:, i:i+1000])
+            protein, seq_feat = self.transformer(transformer_input, seq_feat, mask.float()[:, i: i+1000])
+            y = self.cross_attn(seq_feat, protein, protein)
+            h_V = self.to_hV(y)
+            ys.append(y)
+            h_Vs.append(h_V)
+        y = torch.cat(ys, dim=1)
+        h_V = torch.cat(h_Vs, dim=1)
 
         X = self.atom_norm(self.out(y)).view(batch_size, length, 4, 3)[mask]
         batch_id = torch.arange(x.shape[0]).view(-1, 1).repeat(1, length).to(x.device)[mask]
@@ -74,7 +82,7 @@ class CryoFold(nn.Module):
         X_pred, all_preds = self.decoder_struct.infer_X(X, h_V[mask], batch_id, chain_encoding, 30, virtual_frame_num=3)
         return X_pred, all_preds
     
-    def infer(self, cryo_map, seq, chain_encoding, max_len=1000):
+    def infer(self, cryo_map, seq, chain_encoding, max_len=30000):
         self.eval()
         seq_pos = torch.arange(seq.shape[0], device=cryo_map.device)
         seq, chain_encoding, seq_pos= map(lambda x: x[:max_len].unsqueeze(0), [seq, chain_encoding.long(), seq_pos])
