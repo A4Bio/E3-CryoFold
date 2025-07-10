@@ -1,4 +1,4 @@
-### Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues. Apologize for the delay and the inconvenience of our code.
+### Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues; therefore, we temporarily removed the pretrained model. We apologize for the delay and any inconvenience caused by our code and pretrained model.
 
 # E3-CryoFold: One-shot Prediction For Cryo-EM Structure Determination
 
@@ -60,7 +60,7 @@ To get started with E3-CryoFold, follow these steps:
 
 3. **Download the Pretrained Model**:
 
-    We provide a pretrained model for E3-CryoFold. [Download it here](https://github.com/A4Bio/E3-CryoFold/releases/download/checkpoint/checkpoint.pt) and place it in the pretrained_models directory.
+    We provide a pretrained model for E3-CryoFold. [Download it here](https://github.com/A4Bio/E3-CryoFold/releases/download/checkpoint/checkpoint.pt) and place it in the pretrained_models directory （we ）.
 
 4. **Download the Experimental dataset**:
    The training set can be downloaded in https://doi.org/10.7910/DVN/FCDG0W, and the standard test dataset can be downloaded in https://doi.org/10.7910/DVN/2GSSC9.
