@@ -55,7 +55,7 @@ class Model(nn.Module):
                 start = max(length-3500, 0)
 
             h_V = self.esm(seqs[:,start: end], repr_layers=[12])['representations'][12] 
-            h_Vs.append(h_V[-local_len:])
+            h_Vs.append(h_V[:, -local_len:])
 
         h_V = torch.cat(h_Vs, dim=1)
         h_V = self.encode_head(h_V)

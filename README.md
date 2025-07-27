@@ -153,13 +153,13 @@ This argument increase the refinement steps for structures, but it may also intr
 If you only have a density map without sequence, we also provide two settings to generate the sequence-free structures:
 
 ```bash
-  # pre-align without sequence
-	python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free --t 0.1
+# pre-align without sequence
+python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free --t 0.1
 ```
 
 ```bash
-  # denovo without sequence
-	python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free_denovo --t 1.0
+# denovo without sequence
+python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free_denovo --t 1.0
 ```
 
 
