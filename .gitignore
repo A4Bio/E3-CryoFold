@@ -8,4 +8,7 @@ results/
 core.*
 
 .DS_Store
-checkpoint.pt
+models/
+data/outputs/*
+test.py
+a.py

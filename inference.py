@@ -1,88 +1,52 @@
-import os
-import argparse
-import torch
-from src.chroma.data import Protein
-from model import CryoFold
-from utils import align, get_data, get_coord_from_pdb, alphabet
+"""
+author: nabin 
+timestamp: Tue Jan 02 2024 02:00 PM
+"""
 
+import sys
+sys.path.append('/guoxiaopeng/wangjue/E3-CryoFold')
+import warnings
+warnings.filterwarnings('ignore')
+import pytorch_lightning as pl
+from cryo_module.AutoEM import run_pulchra
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="CryoFold: density map to protein structure")
-    parser.add_argument('--density_map_path', type=str, default='examples/density_map', help='Path to the input data directory')
-    parser.add_argument('--pdb_path', type=str, default='examples/5uz7.pdb', help='Path to the ground truth PDB file')
-    parser.add_argument('--model_path', type=str, default='pretrained_model/checkpoint.pt', 
-                        help='Path to the pretrained model checkpoint')
-    parser.add_argument('--output_dir', type=str, default='results', 
-                        help='Directory to save the output PDB file')
-    parser.add_argument('--device', type=str, choices=['cpu', 'cuda'], default='cuda', 
-                        help='Device to run the model on')
-    parser.add_argument('--verbose', action='store_true', help='Enable verbose output for debugging')
-    return parser.parse_args()
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+import numpy as np
+from argparse import ArgumentParser
+from E3CryoFold2 import E3CryoFold2
 
-def load_model(model_path: str, device: str) -> CryoFold:
-    cryofold = CryoFold(
-        img_shape=(360, 360, 360), input_dim=1, output_dim=4, embed_dim=480,
-        patch_size=36, num_heads=8, dropout=0.1, ext_layers=[3, 6, 9, 12], 
-        norm="instance", decoder_dim=128
-    ).to(device)
-    checkpoint = torch.load(model_path, map_location=device, weights_only=True)
-    try:
-        checkpoint = {k.replace('model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
-        cryofold.load_state_dict(checkpoint)
-    except:
-        checkpoint = {k.replace('_forward_module.model.',''):v for k,v in checkpoint.items() if 'loss_' not in k}
-        cryofold.load_state_dict(checkpoint)
-    return cryofold
-
-
-def preprocess_data(dir_path: str, device: str = 'cuda'):
-    print('Preprocessing data...')
-    data = get_data(dir_path)
-    maps, seq, chain_encoding = (torch.from_numpy(x).to(device) for x in data)
-    print('Preprocessing finished!')
-    return maps, seq, chain_encoding
-
-
-def infer_structure(model: CryoFold, maps: torch.Tensor, seq: torch.Tensor, 
-                    chain_encoding: torch.Tensor, coords: torch.Tensor = None):
-    try:
-        pred_x, _ = model.infer(maps, seq, chain_encoding)
-        if coords is not None:
-            pred_x, rmsd = align(pred_x, coords)
-            print(f'RMSD: {rmsd:.4f}')
-    except Exception as e:
-        print(f"Error during inference: {e}")
-    return pred_x, seq, chain_encoding
-
-
-def save_protein(preds: torch.Tensor, seqs: torch.Tensor, chain_encodings: torch.Tensor, output_dir: str, output_name: str = 'output'):
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, output_name + '.pdb')
-
-    # Process sequence values to ensure they fall within a valid range
-    protein = Protein.from_XCS(preds.unsqueeze(0), chain_encodings.unsqueeze(0), seqs.unsqueeze(0), alphabet=alphabet)
-    protein.to_PDB(output_path)
-    print(f"Protein structure saved to {output_path}")
-
+        
 
 def main():
-    args = parse_arguments()
-    device = args.device if torch.cuda.is_available() and args.device == 'cuda' else 'cpu'
+    pl.seed_everything(42)
+    parser = ArgumentParser()
+    parser = E3CryoFold2.add_model_specific_args(parser)
+    # training specific args
+
+    parser.add_argument('--pretrained', type=str, default='./models/model_weight.pth')
+    parser.add_argument('--stru_pretrained', type=str, default='./models/structure_model.pth', help='structure model; it is needed when user choose the protocol of denovo')
+    parser.add_argument('--map_path', type=str, default='data/inputs/maps/emd_8623.map.gz', help='path of EM map')
+    parser.add_argument('--fasta_path', type=str, default='data/inputs/fastas/5uz7')
+    parser.add_argument('--protocol', type=str, default='pre_align', choices=['pre_align', 'denovo', 'seq_free', 'seq_free_denovo'])
+    parser.add_argument('--save_dir', type=str, default='./data/outputs/')
+    parser.add_argument('--save_name', type=str, default='8623-5uz7-prealign-0.1')
+    parser.add_argument('--spatial_condition', type=bool, default=True, help='whether use spatial conditioner')
+    parser.add_argument('--sequence_condition', type=bool, default=False, help='whether use sequence conditioner')
+    parser.add_argument('--t', type=float, default=0.1)
+    parser.add_argument('--device', type=str, default='cuda')
+
+    args = parser.parse_args()
+
+    model = E3CryoFold2(args=args, model_weights=args.pretrained, struc_model_weight=args.stru_pretrained).to(args.device)
+
+    protein = model.infer(t=args.t, spatial_conditioner=args.spatial_condition, sequence_conditioner=args.sequence_condition)
+    protein.to_PDB(args.save_dir + args.save_name + '.pdb')
     
-    if args.verbose:
-        print(f"Running on device: {device}")
+    if args.pulchra:
+        run_pulchra(args.save_dir, args.pulchra_path, args.save_dir+ args.save_name + '.pdb', args.save_name)
 
-    model = load_model(args.model_path, device)
-    maps, seq, chain_encoding = preprocess_data(args.density_map_path, device)
-
-    coords = None
-    if args.pdb_path:
-        coords = get_coord_from_pdb(args.pdb_path)
-        coords = torch.from_numpy(coords).to(device)
-
-    preds, seqs, chain_encodings = infer_structure(model, maps, seq, chain_encoding, coords)
-    save_protein(preds, seqs, chain_encodings, args.output_dir)
 
 if __name__ == "__main__":
     main()

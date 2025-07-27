@@ -1,6 +1,4 @@
-### Note: We have recently received feedback regarding installation and modeling issues with our models. We are working on checking and resolving these issues; therefore, we temporarily removed the pretrained model. We apologize for the delay and any inconvenience caused by our code and pretrained model.
-
-# E3-CryoFold: One-shot Prediction For Cryo-EM Structure Determination
+# E3-CryoFold: End-to-end Prediction For Cryo-EM Structure Determination(updated)
 
 E3-CryoFold is a deep learning framework for automating the determination of three-dimensional atomic structures from high-resolution cryo-electron microscopy (Cryo-EM) density maps. It addresses the limitations of existing AI-based methods by providing an end-to-end solution that integrates training and inference into a single streamlined pipeline. E3-CryoFold combines 3D and sequence Transformers for feature extraction and employs an equivariant graph neural network to build accurate atomic structures from density maps.
 
@@ -33,12 +31,11 @@ Existing AI-based methods for automating Cryo-EM structure determination face se
 
 E3-CryoFold addresses these challenges by providing a **fully integrated, end-to-end solution** that performs **one-shot inference** with minimal manual intervention, enabling faster and more accurate structure determination.
 
-## Features
-
-- **🚀 End-to-End Training and Inference**: Simplifies the process by seamlessly integrating training and inference into a single, unified framework, eliminating the need for multi-stage processing.
-- **⚡ Fast and Accurate**: Achieves a **400% improvement in TM-score** over Cryo2Struct while reducing inference time by a factor of **1,000**.
-
-For more details on the performance and benchmarking, please refer to our paper.
+## Updated Version
+To solve the issues reported by users, we updated E3-CryoFold from following aspects:
+- **Enhanced Spatial Constraints**: To further improve the generalizability and stability and of E3-CryoFold, instead of using the resized density map as spatial counterpart, we introduce to use the Cα atoms predicted from the density maps as spatial features. This approach constrains the generated structures to better fit to the density maps, which has been discussed in the future work section of our paper.
+- **Extended Sequence Modeling**: To reduce computational costs, we integrated spatial-sequential modeling into the SE(3)-GNN framework. This enhancement allows E3-CryoFold to generate longer chains in a one-shot manner.
+- **Support for Multiple Configurations**: The updated E3-CryoFold supports a wider range of settings for diverse scenarios, including `sequence-free`, `sequence-free de novo`, `pre-alignment`, and `de novo` settings.
 
 ## Installation
 
@@ -53,14 +50,28 @@ To get started with E3-CryoFold, follow these steps:
 
 2. **Create and activate the conda environment**:
 
-    ```bash
-    conda env create -f environment.yml
-    conda activate cryofold
-    ```
+  ```bash
+  conda create -n e3cryofold python=3.9
+  conda activate e3cryofold
+  bash install.sh
+  ```
+
+  ***Note: If you encounter issues with the installation of `torch-scatter`/`torch-geometric`/`torch-cluster`, you can install these softwares using the following command:***
+
+   ```bash
+  pip install torch-scatter/torch-geometric/torch-cluster -f https://data.pyg.org/whl/torch-(your-pytorch-version)+cu(your_CUDA_version).html
+   ```
+
+  For example, if your pytorch version is 2.1.1 and the CUDA version is 11.8. The installation commend is:
+   ```bash
+    pip install torch-scatter/torch-geometric/torch-cluster -f https://data.pyg.org/whl/torch-2.1.1+cu118.html
+   ```
+
+  The detailed information can refer to [https://github.com/rusty1s/pytorch_scatter?tab=readme-ov-file](https://github.com/rusty1s/pytorch_scatter?tab=readme-ov-file)
 
 3. **Download the Pretrained Model**:
 
-    We provide a pretrained model for E3-CryoFold. [Download it here](https://github.com/A4Bio/E3-CryoFold/releases/download/checkpoint/checkpoint.pt) and place it in the pretrained_models directory （we ）.
+    We provide a pretrained model for E3-CryoFold. [Download it here](https://github.com/A4Bio/E3-CryoFold/releases/download/checkpoint/models.zip) and place it in the models directory.
 
 4. **Download the Experimental dataset**:
    The training set can be downloaded in https://doi.org/10.7910/DVN/FCDG0W, and the standard test dataset can be downloaded in https://doi.org/10.7910/DVN/2GSSC9.
@@ -74,9 +85,8 @@ To quickly try out E3-CryoFold using an example dataset, run the following comma
 bash run_example.sh
 ```
 
-This script runs the `inference.py` script with sample data provided in the `examples` folder. It uses a sample density map and a ground truth PDB file for evaluation.
+This script runs the `inference.py` script with sample data provided in the `data/inputs` folder.
 
-We also provide an example tutorial in `quick_start.ipynb`.
 
 ## Usage
 
@@ -86,70 +96,96 @@ The `inference.py` script supports several command-line arguments:
 
 | Argument                 | Description                                             | Default                             |
 |--------------------------|---------------------------------------------------------|-------------------------------------|
-| `--density_map_path`     | Path to the input density map directory (required).     | None                                |
-| `--pdb_path`             | Path to the ground truth PDB file (optional).           | None                                |
-| `--model_path`           | Path to the pretrained model checkpoint.                | `pretrained_model/checkpoint.pt`    |
-| `--output_dir`           | Directory to save the output PDB file.                  | `results`                           |
-| `--device`               | Device to run the model on (`cpu` or `cuda`).           | `cuda`                              |
-| `--verbose`              | Enable verbose output for debugging.                    | Disabled                            |
+| `--map_path`             | Path to the input density map directory (required).     | None                                |
+| `--fasta_path`           | Path to the fasta file (optional, if you set protocol is seq_free).           | None                       |
+| `--pretrained`           | Path to the pretrained model checkpoint.                | `models/model_weight.pth`                       |
+| `--stru_pretrained`      | Path to the structure pretrained model checkpoint.                | `./models/structure_model.pth`       |
+| `--save_dir`             | Directory to save the output PDB file.                  | `./data/outputs/`             |
+| `--save_name`            | Name to save the output PDB file.                       | `example`.                 |
+| `--protocol`             | Setting to generate the atomic structure.               | `pre_align`.               |
+| `--device`               | Device to run the model on (`cpu` or `cuda`).           | `cuda`                     |
+| `--spatial_condition`    | whether use spatial conditioner.                        | True                       |
+| `--sequence_condition`   | whether use sequence conditioner.                       | False                      |
+| `--t`                    | Reverse Stochastic Differential Equation(SDE) start time                                        | 0.1                   |
 
-### Running the Example
-
-You can run the example directly from the command line:
-
-```bash
-python inference.py --density_map_path examples/density_map --pdb_path examples/5uz7.pdb
-```
 
 ### Using Custom Data
 
-To use E3-CryoFold with your own data, you need to provide a Cryo-EM density map and, optionally, a PDB file for evaluating the predicted structure. For example:
+To use E3-CryoFold with your own data, you need to provide a Cryo-EM density map and, optionally, a fasta file for evaluating the predicted structure. For example:
 
 ```bash
-python inference.py --density_map_path /path/to/your/density_map --pdb_path /path/to/your/ground_truth.pdb --output_dir /path/to/save/results --device cuda
+python inference.py --map_path /path/to/your/density_map --fasta_path /path/to/your/fasta --save_dir /path/to/save/results --save_name your_file_name
 ```
 
 ## Tutorial
 
-### 1. Preprocessing Density Maps:
+### 1. Using pre-align setting:
 
-To normalize your density maps, run:
+To improve the constrain of the spatial feature for the generated structure, you can use the pre-align setting:
 
-	# Normalize you density maps
-	$ bash run_data_preparation.bash examples/
+	$ python inference.py --map_path data/inputs/maps/emd_32236.map.gz --fasta_path data/inputs/fastas/7w72 --save_dir ./data/outputs/ --save_name 32236-7w72 --protocol pre_align --t 0.1
 
-After preprocessing, the directory structure should look like:
 
-The organization of the downloaded models should look like:
-```text 
-E3-CryoFold
-├── examples
-│   ├── density_map
-│   │   ├── map.map
-│   │   ├── seq_chain_info.json
-│   │   └── normed_map.mrc
-|   |── pretrained_model
-│   │   ├── checkpoint.pt
-```
+### 2. Using denovo setting:
 
-### 2. Running Inference:
+To improve the constrain of the spatial feature for the generated structure, you can use the pre-align setting:
 
-	python inference.py --density_map_path examples/density_map --pdb_path examples/5uz7.pdb 
+	$ python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-denovo --protocol denovo --t 0.1
 
 After inference, the output will be saved in the specified output directory:
 
 ```text 
 E3-CryoFold
-├── results
-│   └── output.pdb
+├── data
+│   └── outputs
+          ├── 8623-5uz7-denovo.pdb
+          └── 8623-5uz7-denovo_all_atom_model.pdb
 ```
+### 3. Enhancing the spatial constrain:
+
+If you want to make the generated structure align more closely with the density map and more rational, consider increasing the argument `--t` and the SDE steps.
+
+	$ python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-denovo --protocol denovo --t 1.0
+
+This argument increase the refinement steps for structures, but it may also introduce some structural bias.
+
+### 4. Sequence-free modelling:
+If you only have a density map without sequence, we also provide two settings to generate the sequence-free structures:
+
+```bash
+  # pre-align without sequence
+	python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free --t 0.1
+```
+
+```bash
+  # denovo without sequence
+	python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free_denovo --t 1.0
+```
+
+
+
+## Applications
+
+#### Users can utilize E3-CryoFold for several applications:
+### 1. Cryo-EM structure derermination
+E3-CryoFold can generate structures with high accuracy. In some cases, the pre-align setting performs better, while in other scenarios, the de novo setting yields ideal and rational structures.
+
+### 2. Cryo-EM structure refinement
+E3-CryoFold incorporates the Stochastic Differential Equation (SDE) function with spatial and sequential information as constraints. This approach guides the structure to align more closely with the density map, resulting in more rational designs.
+
+### 3. Low-resolution Cryo-EM structure design
+The Cryo-EM density map with low resolution is hard to be solved by current AI method. Since E3-CryoFold fully leverage the sequential information and spatial constrain, E3-CryoFold can provide an effective way to design ideal atomic structure for templates or guidence. We recommend following commend for solving low-resolution map:
+
+	$ python inference.py --map_path /path/to/your/density_map --fasta_path /path/to/your/fasta --save_dir /path/to/save/results --save_name your_file_name --protocol denovo --t 1.0 --spatial_conditon True --sequence_condition True
+
+
 
 ## References
 
-For a complete description of the method, see:
-
 ```
-TBD
+Chen, S., Zhang, S., Fang, X. et al. Protein complex structure modeling by cross-modal alignment between cryo-EM maps and protein sequences. Nat Commun 15, 8808 (2024). https://doi.org/10.1038/s41467-024-53116-5
+
+Ingraham, J.B., Baranov, M., Costello, Z. et al. Illuminating protein space with a programmable generative model. Nature 623, 1070–1078 (2023). https://doi.org/10.1038/s41586-023-06728-8
 ```
 
 ## Contact

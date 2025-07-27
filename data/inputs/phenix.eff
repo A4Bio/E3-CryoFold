@@ -1,0 +1,453 @@
+debug = False
+map_coefficients_label = None
+resolution = None
+rotamers {
+  fit = all *outliers_or_poormap outliers_and_poormap outliers poormap
+  restraints {
+    enabled = True
+    sigma = Auto
+    target = max_distant min_distant exact_match fix_outliers
+  }
+  tuneup = outliers outliers_and_poormap
+}
+write_initial_geo_file = False
+write_final_geo_file = False
+write_all_states = False
+write_pkl_stats = False
+model_format = *pdb *mmcif
+mask_and_he_map = False
+resolution_factor = 0.25
+ncs_constraints = Auto
+refine_ncs_operators = Auto
+variable_rama_potential = False
+weight = None
+real_space_target_exclude_selection = "element H or element D"
+show_statistics = True
+show_per_residue = True
+dry_run = False
+random_seed = 0
+nproc = 8
+gradients_method = fd linear quadratic *tricubic
+scattering_table = n_gaussian wk1995 it1992 *electron neutron
+ignore_symmetry_conflicts = False
+wrapping = Auto
+skip_map_model_overlap_check = False
+absolute_length_tolerance = 0.01
+absolute_angle_tolerance = 0.01
+refinement {
+  run = *minimization_global rigid_body *local_grid_search morphing \
+        simulated_annealing *adp *occupancy *nqh_flips
+  adp_individual_isotropic = Auto
+  adp_individual_isotropic_restraints_weight = 1
+  morphing = every_macro_cycle once *first
+  simulated_annealing = every_macro_cycle *once
+  local_grid_search = every_macro_cycle once *last
+  max_iterations = 100
+  macro_cycles = 5
+  target_bonds_rmsd = 0.01
+  target_angles_rmsd = 1
+  backbone_sample = None
+  use_adp_restraints = True
+  atom_radius = 3
+  do_ss_ideal = False
+  do_ccd = False
+  rigid_body {
+    group = None
+  }
+}
+amber {
+  use_amber = False
+  topology_file_name = None
+  coordinate_file_name = None
+  order_file_name = None
+  wxc_factor = 1
+  restraint_wt = 0
+  restraintmask = ""
+  reference_file_name = ""
+  bellymask = ""
+  qmmask = ""
+  qmcharge = 0
+  netcdf_trajectory_file_name = ""
+  print_amber_energies = False
+}
+reference_model {
+  enabled = False
+  file = None
+  use_starting_model_as_reference = False
+  sigma = 1
+  limit = 15
+  hydrogens = False
+  main_chain = True
+  side_chain = True
+  fix_outliers = True
+  strict_rotamer_matching = False
+  auto_shutoff_for_ncs = False
+  secondary_structure_only = False
+  reference_group {
+    reference = None
+    selection = None
+    file_name = None
+  }
+  search_options {
+    exclude_selection = element H or element D or water
+    chain_similarity_threshold = 0.85
+    chain_max_rmsd = 100
+    residue_match_radius = 1000
+    try_shortcuts = False
+    minimum_number_of_atoms_in_copy = 3
+    validate_user_supplied_groups = True
+  }
+}
+pdb_interpretation {
+  restraints_library {
+    cdl = True
+    mcl = True
+    cis_pro_eh99 = True
+    omega_cdl = False
+    cdl_nucleotides = False
+    cdl_nucleotides_esd = *phenix csd
+    cdl_svl = False
+    rdl = False
+    rdl_selection = *all TRP
+    hpdl = False
+  }
+  sort_atoms = True
+  flip_symmetric_amino_acids = True
+  superpose_ideal_ligand = *None all SF4 F3S DVT
+  disable_uc_volume_vs_n_atoms_check = False
+  allow_polymer_cross_special_position = False
+  correct_hydrogens = True
+  secondary_structure {
+    protein {
+      enabled = True
+      search_method = *ksdssp mmtbx_dssp from_ca cablam
+      distance_ideal_n_o = 2.9
+      distance_cut_n_o = 3.5
+      remove_outliers = True
+      restrain_hbond_angles = True
+      helix {
+        serial_number = None
+        helix_identifier = None
+        enabled = True
+        selection = None
+        helix_type = *alpha pi 3_10 unknown
+        sigma = 0.05
+        slack = 0
+        top_out = False
+        angle_sigma_scale = 1
+        angle_sigma_set = None
+        hbond {
+          donor = None
+          acceptor = None
+        }
+      }
+      sheet {
+        enabled = True
+        first_strand = None
+        sheet_id = None
+        strand {
+          selection = None
+          sense = parallel antiparallel *unknown
+          bond_start_current = None
+          bond_start_previous = None
+        }
+        sigma = 0.05
+        slack = 0
+        top_out = False
+        angle_sigma_scale = 1
+        angle_sigma_set = None
+        hbond {
+          donor = None
+          acceptor = None
+        }
+      }
+    }
+    nucleic_acid {
+      enabled = True
+      hbond_distance_cutoff = 3.4
+      angle_between_bond_and_nucleobase_cutoff = 35
+      scale_bonds_sigma = 1
+      base_pair {
+        enabled = True
+        base1 = None
+        base2 = None
+        saenger_class = 0
+        restrain_planarity = False
+        planarity_sigma = 0.176
+        restrain_hbonds = True
+        restrain_hb_angles = True
+        restrain_parallelity = True
+        parallelity_target = 0
+        parallelity_sigma = 0.0335
+      }
+      stacking_pair {
+        enabled = True
+        base1 = None
+        base2 = None
+        angle = 0
+        sigma = 0.027
+      }
+    }
+    ss_by_chain = True
+    from_ca_conservative = False
+    max_rmsd = 1
+    use_representative_chains = True
+    max_representative_chains = 100
+    enabled = True
+  }
+  c_beta_restraints = True
+  reference_coordinate_restraints {
+    enabled = False
+    exclude_outliers = True
+    selection = all
+    sigma = 0.2
+    limit = 1
+    top_out = False
+  }
+  automatic_linking {
+    link_all = False
+    link_none = False
+    link_metals = Auto
+    link_residues = False
+    link_amino_acid_rna_dna = False
+    link_carbohydrates = True
+    link_ligands = True
+    link_small_molecules = False
+    metal_coordination_cutoff = 3.5
+    amino_acid_bond_cutoff = 1.9
+    inter_residue_bond_cutoff = 2.2
+    buffer_for_second_row_elements = 0.5
+    carbohydrate_bond_cutoff = 1.99
+    ligand_bond_cutoff = 1.99
+    small_molecule_bond_cutoff = 1.98
+  }
+  include_in_automatic_linking {
+    selection_1 = None
+    selection_2 = None
+    bond_cutoff = 4.5
+  }
+  exclude_from_automatic_linking {
+    selection_1 = None
+    selection_2 = None
+  }
+  use_neutron_distances = False
+  apply_cis_trans_specification {
+    cis_trans_mod = cis *trans
+    residue_selection = None
+  }
+  apply_cif_restraints {
+    restraints_file_name = None
+    residue_selection = None
+  }
+  apply_cif_modification {
+    data_mod = None
+    residue_selection = None
+  }
+  apply_cif_link {
+    data_link = None
+    residue_selection_1 = None
+    residue_selection_2 = None
+  }
+  disulfide_bond_exclusions_selection_string = None
+  exclusion_distance_cutoff = 3
+  link_distance_cutoff = 3
+  disulfide_distance_cutoff = 3
+  add_angle_and_dihedral_restraints_for_disulfides = True
+  dihedral_function_type = *determined_by_sign_of_periodicity all_sinusoidal \
+                           all_harmonic
+  chir_volume_esd = 0.2
+  peptide_link {
+    ramachandran_restraints = False
+    cis_threshold = 45
+    apply_all_trans = False
+    discard_omega = False
+    discard_psi_phi = True
+    apply_peptide_plane = False
+    omega_esd_override_value = None
+    rama_weight = 1
+    scale_allowed = 1
+    rama_potential = *oldfield emsley
+    oldfield {
+      esd = 10
+      weight_scale = 1
+      dist_weight_max = 10
+      weight = None
+      plot_cutoff = 0.027
+    }
+    rama_selection = None
+    restrain_rama_outliers = True
+    restrain_rama_allowed = True
+    restrain_allowed_outliers_with_emsley = False
+  }
+  ramachandran_plot_restraints {
+    enabled = True
+    favored = *oldfield emsley emsley8k phi_psi_2
+    allowed = *oldfield emsley emsley8k phi_psi_2
+    outlier = *oldfield emsley emsley8k phi_psi_2
+    selection = None
+    inject_emsley8k_into_oldfield_favored = True
+    oldfield {
+      weight = 0
+      weight_scale = 0.01
+      distance_weight_min = 2
+      distance_weight_max = 10
+      plot_cutoff = 0.027
+    }
+    emsley {
+      weight = 1
+      scale_allowed = 1
+    }
+    emsley8k {
+      weight_favored = 5
+      weight_allowed = 10
+      weight_outlier = 10
+    }
+    phi_psi_2 {
+      favored_strategy = *closest highest_probability random weighted_random
+      allowed_strategy = *closest highest_probability random weighted_random
+      outlier_strategy = *closest highest_probability random weighted_random
+    }
+  }
+  max_reasonable_bond_distance = None
+  nonbonded_distance_cutoff = None
+  default_vdw_distance = 1
+  min_vdw_distance = 1
+  nonbonded_buffer = 1
+  nonbonded_weight = 100
+  const_shrink_donor_acceptor = 0.6
+  vdw_1_4_factor = 0.8
+  min_distance_sym_equiv = 0.5
+  custom_nonbonded_symmetry_exclusions = None
+  translate_cns_dna_rna_residue_names = None
+  proceed_with_excessive_length_bonds = False
+  rna_sugar_pucker_analysis {
+    bond_min_distance = 1.2
+    bond_max_distance = 1.8
+    epsilon_range_min = 155
+    epsilon_range_max = 310
+    delta_range_2p_min = 129
+    delta_range_2p_max = 162
+    delta_range_3p_min = 65
+    delta_range_3p_max = 104
+    p_distance_c1p_outbound_line_2p_max = 2.9
+    o3p_distance_c1p_outbound_line_2p_max = 2.4
+    bond_detection_distance_tolerance = 0.5
+  }
+  show_histogram_slots {
+    bond_lengths = 5
+    nonbonded_interaction_distances = 5
+    bond_angle_deviations_from_ideal = 5
+    dihedral_angle_deviations_from_ideal = 5
+    chiral_volume_deviations_from_ideal = 5
+  }
+  show_max_items {
+    not_linked = 5
+    bond_restraints_sorted_by_residual = 5
+    nonbonded_interactions_sorted_by_model_distance = 5
+    bond_angle_restraints_sorted_by_residual = 5
+    dihedral_angle_restraints_sorted_by_residual = 3
+    chirality_restraints_sorted_by_residual = 3
+    planarity_restraints_sorted_by_residual = 3
+    residues_with_excluded_nonbonded_symmetry_interactions = 12
+    fatal_problem_max_lines = 10
+  }
+  ncs_group {
+    reference = None
+    selection = None
+  }
+  ncs_search {
+    enabled = True
+    exclude_selection = water
+    chain_similarity_threshold = 0.85
+    chain_max_rmsd = 999
+    residue_match_radius = 1000
+    try_shortcuts = False
+    minimum_number_of_atoms_in_copy = 3
+    validate_user_supplied_groups = True
+  }
+  clash_guard {
+    nonbonded_distance_threshold = 0.5
+    max_number_of_distances_below_threshold = 100
+    max_fraction_of_distances_below_threshold = 0.1
+  }
+}
+geometry_restraints {
+  edits {
+    excessive_bond_distance_limit = 10
+    bond {
+      action = *add delete change
+      atom_selection_1 = None
+      atom_selection_2 = None
+      symmetry_operation = None
+      distance_ideal = None
+      sigma = None
+      slack = None
+      limit = -1.0
+      top_out = False
+    }
+    angle {
+      action = *add delete change
+      atom_selection_1 = None
+      atom_selection_2 = None
+      atom_selection_3 = None
+      angle_ideal = None
+      sigma = None
+    }
+    dihedral {
+      action = *add delete change
+      atom_selection_1 = None
+      atom_selection_2 = None
+      atom_selection_3 = None
+      atom_selection_4 = None
+      angle_ideal = None
+      alt_angle_ideals = None
+      sigma = None
+      periodicity = 1
+    }
+    planarity {
+      action = *add delete change
+      atom_selection = None
+      sigma = None
+    }
+    parallelity {
+      action = *add delete change
+      atom_selection_1 = None
+      atom_selection_2 = None
+      sigma = 0.027
+      target_angle_deg = 0
+    }
+  }
+  remove {
+    angles = None
+    dihedrals = None
+    chiralities = None
+    planarities = None
+    parallelities = None
+  }
+}
+simulated_annealing {
+  start_temperature = 5000
+  final_temperature = 300
+  cool_rate = 100
+  number_of_steps = 50
+  time_step = 0.0005
+  initial_velocities_zero_fraction = 0
+  interleave_minimization = False
+  verbose = -1
+  n_print = 100
+  update_grads_shift = 0.3
+  random_seed = None
+}
+output {
+  suffix = "_real_space_refined"
+  filename = None
+  file_name = None
+  prefix = None
+  serial = 0
+  overwrite = True
+}
+job_title = None
+gui {
+  output_dir = None
+  run_validation = True
+}
