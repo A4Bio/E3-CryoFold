@@ -33,7 +33,7 @@ E3-CryoFold addresses these challenges by providing a **fully integrated, end-to
 
 ## Updated Version
 To solve the issues reported by users, we updated E3-CryoFold from following aspects:
-- **Enhanced Spatial Constraints**: To further improve the generalizability and stability and of E3-CryoFold, instead of using the resized density map as spatial counterpart, we introduce to use the Cα atoms predicted from the density maps as spatial features. This approach constrains the generated structures to better fit to the density maps, which has been discussed in the future work section of our paper.
+- **Enhanced Spatial Constraints**: To further improve the generalizability and stability of E3-CryoFold, instead of using the resized density map as spatial counterpart, we introduce to use the Cα atoms predicted from the density maps as spatial features. This approach constrains the generated structures to better fit to the density maps, which has been discussed in the future work section of our paper.
 - **Extended Sequence Modeling**: To reduce computational costs, we integrated spatial-sequential modeling into the SE(3)-GNN framework. This enhancement allows E3-CryoFold to generate longer chains in a one-shot manner.
 - **Support for Multiple Configurations**: The updated E3-CryoFold supports a wider range of settings for diverse scenarios, including `sequence-free`, `sequence-free de novo`, `pre-alignment`, and `de novo` settings.
 
