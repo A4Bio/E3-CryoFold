@@ -3,8 +3,6 @@ author: nabin
 timestamp: Tue Jan 02 2024 02:00 PM
 """
 
-import sys
-sys.path.append('/guoxiaopeng/wangjue/E3-CryoFold')
 import warnings
 warnings.filterwarnings('ignore')
 import pytorch_lightning as pl

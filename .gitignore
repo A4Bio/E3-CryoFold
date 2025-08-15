@@ -8,6 +8,7 @@ results/
 core.*
 
 .DS_Store
+models/
 data/outputs/*
 test.py
 a.py
