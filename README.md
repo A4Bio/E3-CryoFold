@@ -123,7 +123,7 @@ python inference.py --map_path /path/to/your/density_map --fasta_path /path/to/y
 
 To improve the constrain of the spatial feature for the generated structure, you can use the pre-align setting:
 
-	$ python inference.py --map_path data/inputs/maps/emd_32236.map.gz --fasta_path data/inputs/fastas/7w72 --save_dir ./data/outputs/ --save_name 32236-7w72 --protocol pre_align --t 0.1
+	$ python inference.py --map_path data/inputs/maps/emd_32336.map.gz --fasta_path data/inputs/fastas/7w72 --save_dir ./data/outputs/ --save_name 32336-7w72 --protocol pre_align --t 0.1
 
 
 ### 2. Using denovo setting:
