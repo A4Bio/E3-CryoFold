@@ -25,8 +25,8 @@ def main():
 
     parser.add_argument('--pretrained', type=str, default='./models/model_weight.pth')
     parser.add_argument('--stru_pretrained', type=str, default='./models/structure_model.pth', help='structure model; it is needed when user choose the protocol of denovo')
-    parser.add_argument('--map_path', type=str, default='data/inputs/maps/emd_8623.map.gz', help='path of EM map')
-    parser.add_argument('--fasta_path', type=str, default='data/inputs/fastas/5uz7')
+    parser.add_argument('--map_path', type=str, default='', help='path of EM map')
+    parser.add_argument('--fasta_path', type=str, default='')
     parser.add_argument('--protocol', type=str, default='pre_align', choices=['pre_align', 'denovo', 'seq_free', 'seq_free_denovo'])
     parser.add_argument('--save_dir', type=str, default='./data/outputs/')
     parser.add_argument('--save_name', type=str, default='8623-5uz7-prealign-0.1')

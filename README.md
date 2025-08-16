@@ -154,12 +154,12 @@ If you only have a density map without sequence, we also provide two settings to
 
 ```bash
 # pre-align without sequence
-python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free --t 0.1
+python inference.py --map_path data/inputs/maps/emd_8623.map.gz  --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free --t 0.1
 ```
 
 ```bash
 # denovo without sequence
-python inference.py --map_path data/inputs/maps/emd_8623.map.gz --fasta_path data/inputs/fastas/5uz7 --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree --protocol seq_free_denovo --t 1.0
+python inference.py --map_path data/inputs/maps/emd_8623.map.gz --save_dir ./data/outputs/ --save_name 8623-5uz7-seqfree-denovo --protocol seq_free_denovo --t 1.0
 ```
 
 
