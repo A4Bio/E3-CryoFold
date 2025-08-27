@@ -1046,9 +1046,14 @@ class CryoProcesser:
 
     def clustering(self):
         pcd_numpy = np.array(np.where(self.CAProb > self.dynamic_config.CA_score_thrh)).T
+        pcd_numpy = pcd_numpy.astype(np.float64)
         pcd_raw = o3d.geometry.PointCloud()
+
+        if not pcd_numpy.flags['C_CONTIGUOUS']:
+            pcd_numpy = np.ascontiguousarray(pcd_numpy)
         pcd_raw.points = o3d.utility.Vector3dVector(pcd_numpy)
         labels = np.array(pcd_raw.cluster_dbscan(eps=self.cluster_eps, min_points=self.cluster_min_points))
+        pcd_numpy = pcd_numpy.astype(np.int64)
 
         labels_scores_sum = []
         for label in range(labels.max()+1):
